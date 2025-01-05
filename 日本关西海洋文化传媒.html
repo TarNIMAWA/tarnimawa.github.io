@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="关西数字通讯 - 用科技连接未来">
+    <title>关西数字通讯</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 20px 0;
+        }
+        header .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        header p {
+            margin: 10px 0 0;
+            font-size: 1.2rem;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav ul li {
+            display: inline;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        section {
+            padding: 50px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h2 {
+            font-size: 2rem;
+            color: #0078d7;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p, ul {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        ul {
+            list-style: disc;
+            margin: 20px 0 0;
+            padding-left: 40px;
+        }
+        .project-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .project-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: calc(33.333% - 40px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .project-item h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .project-item p {
+            margin: 10px 0 0;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        form input, form textarea, form button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #0078d7;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #005bb5;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>关西数字通讯</h1>
+            <p>用科技连接未来</p>
+            <nav>
+                <ul>
+                    <li><a href="#about">关于我们</a></li>
+                    <li><a href="#services">服务内容</a></li>
+                    <li><a href="#projects">项目案例</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="about">
+        <div class="container">
+            <h2>关于我们</h2>
+            <p>关西数字通讯是一家致力于数字通信技术开发和解决方案提供的领先企业。我们专注于用创新技术助力企业和社会的数字化转型。</p>
+        </div>
+    </section>
+
+    <section id="services">
+        <div class="container">
+            <h2>服务内容</h2>
+            <ul>
+                <li>高效的企业通信平台开发</li>
+                <li>数字营销解决方案</li>
+                <li>智能客服与自动化系统</li>
+                <li>数据分析与技术支持</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="projects">
+        <div class="container">
+            <h2>项目案例</h2>
+            <p>以下是我们部分成功的项目案例：</p>
+            <div class="project-list">
+                <div class="project-item">
+                    <h3>企业内部通信系统</h3>
+                    <p>为大型企业构建高效、安全的内部通信平台。</p>
+                </div>
+                <div class="project-item">
+                    <h3>智能客服系统</h3>
+                    <p>利用人工智能技术，实现24/7全天候客户服务。</p>
+                </div>
+                <div class="project-item">
+                    <h3>大数据分析平台</h3>
+                    <p>为企业提供定制化的大数据分析和报告生成工具。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <h2>联系我们</h2>
+            <p>如需了解更多信息或咨询合作，请填写下方表单：</p>
+            <form action="submit_form.php" method="post">
+                <label for="name">姓名：</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">邮箱：</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">留言：</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+
+                <button type="submit">发送</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 关西数字通讯. 保留所有权利。</p>
+        </div>
+    </footer>
+</body>
+</html>
