@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftWings科技有限公司</title>
+    <style>
+        *{
+            margin: 0;
+            font-weight: 100;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* NavBar */
+        .navbar{
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            padding: 10px 15px;
+            font-size: 18px;
+        }
+        .navbar .name{
+            font-size: 28px;
+            margin-left: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .navbar .version{
+            background: whitesmoke;
+            padding: 5px 15px;
+            vertical-align: middle;
+            font-size: 14px;
+            cursor: default;
+            margin-left: 10px;
+            border-radius: 4px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .navbar .version:hover{
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+        /* Pre */
+        .code{
+            background: whitesmoke;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 18px;
+            display: inline-block;
+        }
+        /* Button */
+        .btn{
+            background: whitesmoke;
+            border-radius: 4px;
+            padding: 8px 15px;
+            display: inline-block;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .btn-gradient-warm{
+            color: white;
+            background: linear-gradient(to right,#d24d4e, #6f7bce); /* 加深颜色 */
+        }
+        .btn-gradient-warm:hover{
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+        .btn i{
+            margin-right: 5px;
+        }
+        /* Position */
+        .content-p{
+            float: left;
+            margin-left: 10%;
+        }
+        .pos{
+            margin-right: 5px;
+        }
+        /* Box */
+        .box{
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        /* Text */
+        .gradient-text-warm{
+            display: inline-block;
+            background: linear-gradient(to right,#e66465, #9198e5);
+            -webkit-background-clip: text;
+            color: transparent;
+            background-clip: text;
+        }
+        .gradient-text-cold{
+            display: inline-block;
+            background: linear-gradient(to right,lightgreen, deepskyblue);
+            -webkit-background-clip: text;
+            color: transparent;
+            background-clip: text;
+        }
+        .small-title{
+            font-size: 24px;
+        }
+        .mid-title{
+            font-size: 30px;
+        }
+        .large-title{
+            font-size: 36px;
+        }
+        .huge-title{
+            font-size: 48px;
+        }
+        .tips{
+            color: grey;
+            font-size: 18px;
+        }
+        /* Tips */
+        .warn-tips{
+            background: orange;
+            color: white;
+            border-radius: 4px;
+            padding: 5px 10px;
+            user-select: none;
+        }
+        .warn-tips i{
+            color: white;
+            margin-right: 5px;
+        }
+        .notice {
+            border-left: solid 7px deepskyblue;
+            padding: 10px 10px;
+            user-select: none;
+            transition: 0.3s;
+            border-top-right-radius: 4px;
+            margin-top: 10px;
+            font-size: 18px;
+            border-bottom-right-radius: 4px;
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            display: inline-block;
+        }
+        /* Link */
+        .link{
+            text-decoration: none;
+            color: deepskyblue;
+            transition: 0.3s;
+            font-size: 28px;
+        }
+        .link:hover{
+            color: orange;
+            transition: 0.3s;
+        }
+        /* Animation */
+        .fadeIn{
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn{
+            0%{
+                opacity: 0;
+            }
+            100%{
+                opacity: 100%;
+            }
+        }
+
+        /* 放大 GitHub 图标 */
+        #contact-info img {
+            width: 50px; /* 放大图标 */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span class="name gradient-text-warm">SwiftWings科技</span>
+        <span class="version">V1.0</span>
+    </div>
+    
+    <div class="content-p">
+        <h1 class="large-title">引领科技创新，赋能未来</h1>
+        <p class="tips">越南SwiftWings科技有限公司，专注于软件开发与智能解决方案</p>
+        
+        <div class="box">
+            <h2 class="mid-title">关于我们</h2>
+            <p>SwiftWings科技成立于2025年，是一家领先的科技公司，专注于人工智能、大数据和企业软件解决方案。</p>
+        </div>
+        
+        <div class="box">
+            <h2 class="mid-title">我们的服务</h2>
+            <ul>
+                <li>企业级软件开发</li>
+                <li>人工智能与机器学习</li>
+                <li>云计算与大数据分析</li>
+                <li>移动应用开发</li>
+            </ul>
+        </div>
+        
+        <div class="notice">
+            <i>📢</i> 最新消息：SwiftWings科技即将发布全新AI大模型！
+        </div>
+        
+        <a href="javascript:void(0);" class="btn btn-gradient-warm" onclick="return false;">联系我们</a>
+        
+        <div id="contact-info">
+            <a href="https://github.com/tarnimawa" target="_blank" class="link">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        <p class="tips">© 2025 SwiftWings科技有限公司 | <a href="#" class="link">隐私政策</a></p>
+    </footer>
+</body>
+</html>
+
