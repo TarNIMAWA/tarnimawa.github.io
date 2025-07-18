@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>地球online</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    background-color: #222222;
+    color: #33ff33;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+  #left {
+    width: 50%;
+    border-right: 1px solid #33ff33;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  #title {
+    color: #00bfff;
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    user-select: none;
+  }
+  #ipInfo {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    color: #ffff66;
+    user-select: none;
+  }
+  #terminal {
+    flex: 1;
+    background: #000;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 0 8px #33ff33aa inset;
+  }
+  #commandInput {
+    margin-top: 10px;
+    background: #000;
+    border: 1px solid #33ff33;
+    color: #33ff33;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #right {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #222222;
+    user-select: none;
+    position: relative;
+  }
+  canvas {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #00bfff88;
+    display: block;
+  }
+  /* 地球轮廓线 */
+  .line {
+    stroke: #00bfff;
+    stroke-opacity: 0.7;
+    fill: none;
+    stroke-width: 1.2;
+  }
+
+  /* 智能客服窗口 */
+  #chatBot {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 320px;
+    max-height: 420px;
+    background: #111;
+    border: 2px solid #00bfff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #33ff33;
+    box-shadow: 0 0 12px #00bfffaa;
+    user-select: text;
+    z-index: 1000;
+  }
+  #chatHeader {
+    background: #003366;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #chatHeader span.closeBtn {
+    cursor: pointer;
+    font-weight: normal;
+    color: #ff4444;
+  }
+  #chatContent {
+    flex: 1;
+    padding: 8px 12px;
+    overflow-y: auto;
+    background: #000;
+    white-space: pre-wrap;
+  }
+  #chatInputArea {
+    border-top: 1px solid #00bfff;
+    display: flex;
+  }
+  #chatInput {
+    flex: 1;
+    background: #000;
+    border: none;
+    color: #33ff33;
+    padding: 8px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    outline: none;
+  }
+  #chatSendBtn {
+    background: #00bfff;
+    border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #chatSendBtn:hover {
+    background: #33ccff;
+  }
+  #chatToggleBtn {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    background: #00bfff;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    color: #000;
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 0 12px #00bfffaa;
+    z-index: 1000;
+    display: block;
+  }
+</style>
+</head>
+<body>
+  <div id="left">
+    <div id="title">欢迎地球管理员进入地球online</div>
+    <div id="ipInfo">您所在服务区域为 <span id="ip">定位中...</span></div>
+    <div id="terminal">输入 /help 查看指令列表</div>
+    <input id="commandInput" placeholder="请输入指令，例如 /help" autocomplete="off" autofocus />
+  </div>
+  <div id="right">
+    <canvas id="globeCanvas" width="320" height="320"></canvas>
+    <svg id="globeLines" width="320" height="320" style="position:absolute; top:50%; left:50%; transform: translate(-50%, -50%); pointer-events:none;">
+      <path class="line" d="M160,60 C210,100 210,220 160,260" />
+      <path class="line" d="M140,60 C90,100 90,220 140,260" />
+      <path class="line" d="M110,80 C160,100 160,220 110,240" />
+    </svg>
+  </div>
+
+  <!-- 智能客服窗口 -->
+  <div id="chatBot" style="display:none;">
+    <div id="chatHeader">地球online智能客服 <span class="closeBtn" title="关闭客服">✖</span></div>
+    <div id="chatContent"></div>
+    <div id="chatInputArea">
+      <input id="chatInput" placeholder="请输入管理员密码登录客服" />
+      <button id="chatSendBtn">发送</button>
+    </div>
+  </div>
+  <div id="chatToggleBtn" title="打开智能客服">💬</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+  // IP获取
+  fetch('https://api.ipify.org?format=json')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('ip').textContent = data.ip;
+    })
+    .catch(() => {
+      document.getElementById('ip').textContent = '未知';
+    });
+
+  const terminal = document.getElementById('terminal');
+  const input = document.getElementById('commandInput');
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // 命令处理函数（含所有指令）
+  function generateAIResponse(command, arg) {
+    switch (command) {
+      case "climate_change":
+        return randomChoice([
+          "气候变化日益严重，冰川持续融化，全球都在感受到它的影响。",
+          "气候正在变暖，极端天气频发，请注意防范。",
+          "科学家警告：气候变化影响深远，需要全球合作。"
+        ]);
+      case "population_growth":
+        return randomChoice([
+          "人口不断增长，城市变得越来越拥挤。",
+          "人口压力大，资源分配需要优化。",
+          "增长的人口为世界带来了挑战和机遇。"
+        ]);
+      case "volcanic_eruption":
+        return randomChoice([
+          "火山爆发！天空中弥漫着灰烬和硫磺味。",
+          "强烈的火山活动影响了当地居民的生活。",
+          "火山灰覆盖土地，暂时阻断了交通。"
+        ]);
+      case "glacier_melting":
+        return randomChoice([
+          "冰川加速融化，海平面缓慢上升。",
+          "淡水资源紧张，生态系统遭受冲击。",
+          "冰川的变化正在改变地球的面貌。"
+        ]);
+      case "water_crisis":
+        return randomChoice([
+          "水资源短缺，居民生活受到影响。",
+          "水质污染加重，需要紧急处理。",
+          "水源保护刻不容缓，大家需节约用水。"
+        ]);
+      case "extreme_weather":
+        return randomChoice([
+          "极端天气频繁出现，带来灾害风险。",
+          "风暴、洪水、干旱，影响农业生产。",
+          "气候异常引发社会关注。"
+        ]);
+      case "earth_observation":
+        return randomChoice([
+          "卫星实时监控地球环境，数据精准可靠。",
+          "观测系统升级，提升灾害预警能力。",
+          "全球监测网络助力科学研究。"
+        ]);
+      case "deforestation":
+        return randomChoice([
+          "森林砍伐严重，生物多样性受损。",
+          "碳汇能力下降，气候压力加剧。",
+          "森林保护任务刻不容缓。"
+        ]);
+      case "urban_expansion":
+        return randomChoice([
+          "城市不断扩张，绿地面积减少。",
+          "交通拥堵和空气污染日益严重。",
+          "城市规划需更加合理与环保。"
+        ]);
+      case "geographical_exploration":
+        return randomChoice([
+          "新的地理发现拓展了人类认知。",
+          "探险队带回丰富的科学数据。",
+          "地图信息更新完善。"
+        ]);
+      case "energy_crisis":
+        return randomChoice([
+          "传统能源枯竭，新能源需求攀升。",
+          "节能减排成为重要课题。",
+          "能源供需紧张，影响经济发展。"
+        ]);
+      case "permafrost_change":
+        return randomChoice([
+          "冻土融化释放大量温室气体，加剧气候变暖。",
+          "北极地区基础设施面临风险。",
+          "生态系统反馈效应加快。"
+        ]);
+      case "solar_activity":
+        return randomChoice([
+          "太阳活动增强，极光频繁出现。",
+          "太阳风暴可能干扰卫星通信。",
+          "科学家密切监测太阳变化。"
+        ]);
+      case "ocean_current_change":
+        return randomChoice([
+          "洋流变化导致气候模式调整。",
+          "海洋生态系统承受压力。",
+          "沿海天气表现出异常波动。"
+        ]);
+      case "disaster_alert":
+        return randomChoice([
+          "灾害预警已发出，请做好防范。",
+          "紧急响应系统启动，保障安全。",
+          "民众积极配合防灾工作。"
+        ]);
+      case "pause_simulation":
+        return randomChoice([
+          "模拟器已暂停，所有动态停止。",
+          "系统进入待命状态，等待继续指令。",
+          "暂停成功，输入 /resume 恢复运行。"
+        ]);
+      case "resume_simulation":
+        return randomChoice([
+          "模拟器恢复运行，动态继续。",
+          "系统重新激活，欢迎回来。",
+          "运行已恢复，祝您操作顺利。"
+        ]);
+      case "select_resident":
+        return randomChoice([
+          "请输入居民编号进行对话，例如：123 你好",
+          "居民互动功能上线，输入居民ID和消息开始聊天。",
+          "居民聊天模拟已启动。"
+        ]);
+      case "view_instructions":
+        return randomChoice([
+          "地球online模拟器，输入指令操控世界。",
+          "输入 /help 查看所有指令及说明。",
+          "祝您使用愉快！"
+        ]);
+      case "biodiversity":
+        return randomChoice([
+          "生物多样性下降，生态系统面临威胁。",
+          "保护物种刻不容缓。",
+          "生态保护取得了一定进展。"
+        ]);
+      case "human_activity_impact":
+        return randomChoice([
+          "人类活动对环境产生了巨大影响。",
+          "污染和资源过度使用需控制。",
+          "绿色发展是未来方向。"
+        ]);
+      case "money":
+        if (!arg || isNaN(arg)) return "请指定正确的金额，例如 /money 100";
+        return randomChoice([
+          `[居民E] 哦豁今天发钱了！我买瓶“地球水”去～（${arg}元）`,
+          `[居民E] 领到了${arg}元，生活有盼头了！`,
+          `[居民E] 收到${arg}元，感谢管理员的关怀！`
+        ]);
+      case "geo":
+        return randomChoice([
+          "[居民F] 地理题到了！刚好我想学“喀斯特地貌”。",
+          "[居民F] 地理测试题发放完毕，期待大家的好成绩。",
+          "[居民F] 新的地理题目已上线，激发探索兴趣。"
+        ]);
+      case "weather":
+        return randomChoice([
+          "[居民G] 海风太大了吧，衣服都吹飞啦！",
+          "[居民G] 今天阳光明媚，适合出行。",
+          "[居民G] 下雨了，记得带伞哦！"
+        ]);
+      case "build":
+        if (!arg) return "请指定建造对象，例如 /build 工厂";
+        return randomChoice([
+          "[居民H] 谁在我家旁边盖厂？空气质量警告！",
+          "[居民H] 新工厂开始运作，带来就业机会。",
+          "[居民H] 建造工厂中，注意环保。"
+        ]);
+      case "tax":
+        if (!arg || !/^(\+|-)?\d+%$/.test(arg)) return "请指定正确的税率变动，例如 /tax +5%";
+        return randomChoice([
+          `[居民I] 不是吧，这个月刚交完，居然涨税${arg}！`,
+          `[居民I] 税收提高了${arg}，生活压力加大。`,
+          `[居民I] 新的税率调整，大家共同努力。`
+        ]);
+      case "ban":
+        if (!arg) return "请指定要禁言的用户名，例如 /ban 小王";
+        return randomChoice([
+          `[居民J] ${arg}怎么不说话了，是不是骂人被抓？`,
+          `[居民J] ${arg}被禁言了，大家注意言辞。`,
+          `[居民J] 禁言措施严格，社区氛围更好了。`
+        ]);
+      case "travel":
+        if (!arg) return "请指定旅行目的地，例如 /travel 云南";
+        return randomChoice([
+          `[居民K] ${arg}美爆了，管理员懂玩！`,
+          `[居民K] 全体旅行${arg}，好开心！`,
+          `[居民K] ${arg}风景真赞，期待下一次旅行。`
+        ]);
+      case "geobook":
+        return randomChoice([
+          "地球科学知识：地壳主要由硅和氧组成。",
+          "地球科学知识：火山喷发释放的岩浆会形成新的地质结构。",
+          "地球科学知识：板块运动是地震的主要原因。",
+          "地球科学知识：海洋覆盖了地球表面的70%以上。",
+          "地球科学知识：冰川对地貌有着深远的影响。"
+        ]);
+      case "kill":
+        if (!arg) return "请指定要抹除的目标，格式：/kill 目标 [原因]";
+        const parts = arg.split(' ');
+        const target = parts[0];
+        const reason = parts.slice(1).join(' ') || "无具体原因";
+        return `用户“${target}”已被抹除，原因：${reason}\n社区环境已更新。`;
+      case "help":
+        return [
+          "地球online可用指令：",
+          "/money {金额} - 发钱给居民",
+          "/ban {用户名} - 禁言用户",
+          "/geo - 发布地理题目",
+          "/travel {地点} - 组织旅行",
+          "/geobook - 普及地球科学知识",
+          "/kill {目标} [原因] - 抹除用户",
+          "/build {建筑} - 建造设施",
+          "/tax {变动%} - 调整税率",
+          "/weather - 天气相关",
+          "/pause_simulation - 暂停模拟器",
+          "/resume_simulation - 恢复模拟器",
+          "/help - 显示帮助"
+        ].join('\n');
+      default:
+        return "未知指令，请输入 /help 查看所有指令。";
+    }
+  }
+
+  // 终端输出函数，自动滚动到底部
+  function appendTerminal(text) {
+    terminal.textContent += "\n" + text;
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  // 输入处理
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      let val = input.value.trim();
+      if (!val) return;
+      appendTerminal("> " + val);
+
+      if (val.startsWith('/')) {
+        // 解析指令和参数
+        let spaceIdx = val.indexOf(' ');
+        let cmd = '';
+        let arg = '';
+        if (spaceIdx === -1) {
+          cmd = val.slice(1).toLowerCase();
+        } else {
+          cmd = val.slice(1, spaceIdx).toLowerCase();
+          arg = val.slice(spaceIdx + 1);
+        }
+
+        // 客服命令特殊处理
+        if(cmd === '客服' || cmd === 'chatbot'){
+          chatToggle(true);
+          appendTerminal("已打开智能客服，输入管理员密码登录。");
+          input.value = '';
+          return;
+        }
+
+        // 密码验证命令（示例，输入 /password 123456）
+        if(cmd === 'password'){
+          if(arg === '123456'){
+            appendTerminal("管理员密码验证通过，智能客服已解锁。");
+            chatbotUnlocked = true;
+          } else {
+            appendTerminal("管理员密码错误！");
+          }
+          input.value = '';
+          return;
+        }
+
+        // 处理指令
+        let res = generateAIResponse(cmd, arg);
+        appendTerminal(res);
+      } else {
+        appendTerminal("请以 / 开头输入指令。");
+      }
+      input.value = '';
+    }
+  });
+
+const canvas = document.getElementById('globeCanvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+  camera.position.z = 3;
+
+  // 纹理加载器
+  const textureLoader = new THREE.TextureLoader();
+
+  // 地球主体半透明蓝色
+  const earthGeometry = new THREE.SphereGeometry(1, 64, 64);
+  const earthMaterial = new THREE.MeshPhongMaterial({
+    color: 0x00aaff,
+    transparent: true,
+    opacity: 0.5,
+    shininess: 30,
+    side: THREE.DoubleSide,
+  });
+  const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+  scene.add(earthMesh);
+
+  // 移除原密集wireframe，改成稀疏的经纬线轮廓
+
+  // 线条材质
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0x66ccff,
+    transparent: true,
+    opacity: 0.7,
+  });
+
+  // 创建线条组
+  const linesGroup = new THREE.Group();
+
+  // 经线7条（间隔约30度）
+  for (let i = 0; i < 7; i++) {
+    const lon = (i * Math.PI) / 6 - Math.PI / 2; // -90° 到 +90°
+    const points = [];
+    for (let lat = -Math.PI / 2; lat <= Math.PI / 2; lat += 0.01) {
+      const x = Math.cos(lat) * Math.cos(lon);
+      const y = Math.sin(lat);
+      const z = Math.cos(lat) * Math.sin(lon);
+      points.push(new THREE.Vector3(x, y, z));
+    }
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry, lineMaterial);
+    linesGroup.add(line);
+  }
+
+  // 纬线3条（间隔约30度）
+  const latitudes = [-Math.PI / 6, 0, Math.PI / 6]; // -30°, 0°, +30°
+  latitudes.forEach(lat => {
+    const points = [];
+    for (let lon = -Math.PI; lon <= Math.PI; lon += 0.01) {
+      const x = Math.cos(lat) * Math.cos(lon);
+      const y = Math.sin(lat);
+      const z = Math.cos(lat) * Math.sin(lon);
+      points.push(new THREE.Vector3(x, y, z));
+    }
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry, lineMaterial);
+    linesGroup.add(line);
+  });
+
+  scene.add(linesGroup);
+
+  // 科技网格纹理球
+  const techGridTexture = textureLoader.load('https://i.imgur.com/s8uZNEZ.png');
+  const techGeometry = new THREE.SphereGeometry(1.01, 64, 64);
+  const techMaterial = new THREE.MeshPhongMaterial({
+    map: techGridTexture,
+    transparent: true,
+    opacity: 0.3,
+    shininess: 0,
+    side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const techMesh = new THREE.Mesh(techGeometry, techMaterial);
+  scene.add(techMesh);
+
+  // 光源
+  const ambientLight = new THREE.AmbientLight(0x8888aa);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0x00bfff, 1.2);
+  directionalLight.position.set(5, 3, 5);
+  scene.add(directionalLight);
+
+  // 控制器
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = true;
+  controls.minDistance = 1.5;
+  controls.maxDistance = 4;
+
+  // 窗口调整尺寸
+  function onWindowResize() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', onWindowResize);
+  onWindowResize();
+
+  // 动画循环
+  function animate() {
+    requestAnimationFrame(animate);
+    earthMesh.rotation.y += 0.0007;
+    linesGroup.rotation.y += 0.0007;
+    techMesh.rotation.y += 0.0007;
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+
+  // ---------- 智能客服 ---------- //
+  const chatBot = document.getElementById('chatBot');
+  const chatToggleBtn = document.getElementById('chatToggleBtn');
+  const chatCloseBtn = document.querySelector('#chatBot .closeBtn');
+  const chatContent = document.getElementById('chatContent');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+
+  let chatbotUnlocked = false;
+
+  function chatToggle(show) {
+    if (show === undefined) {
+      if (chatBot.style.display === 'none' || chatBot.style.display === '') {
+        show = true;
+      } else {
+        show = false;
+      }
+    }
+    chatBot.style.display = show ? 'flex' : 'none';
+    chatToggleBtn.style.display = show ? 'none' : 'block';
+    if(show) chatInput.focus();
+  }
+
+  chatToggleBtn.addEventListener('click', () => {
+    chatToggle(true);
+  });
+  chatCloseBtn.addEventListener('click', () => {
+    chatToggle(false);
+  });
+
+  // 聊天内容追加
+  function appendChat(text, isUser = false) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.style.marginBottom = '6px';
+    div.style.whiteSpace = 'pre-wrap';
+    div.style.color = isUser ? '#00ffff' : '#33ff33';
+    chatContent.appendChild(div);
+    chatContent.scrollTop = chatContent.scrollHeight;
+  }
+
+  // 客服消息处理
+  function chatbotResponse(msg) {
+    if (!chatbotUnlocked) {
+      if (msg === '123456') {
+        chatbotUnlocked = true;
+        appendChat("管理员密码正确，智能客服已解锁。");
+      } else {
+        appendChat("管理员密码错误，请重新输入。");
+      }
+      return;
+    }
+    // 简单智能客服回复示例
+    const lower = msg.toLowerCase();
+    if (lower.includes('帮助') || lower.includes('指令')) {
+      appendChat("你可以输入指令，例如 /money, /ban, /geo, /travel, /geobook, /kill 等。");
+    } else if (lower.includes('地球')) {
+      appendChat("地球是我们赖以生存的家园，保护环境刻不容缓。");
+    } else {
+      appendChat("感谢您的留言，管理员稍后回复。");
+    }
+  }
+
+  // 发送按钮和回车事件
+  chatSendBtn.addEventListener('click', () => {
+    let val = chatInput.value.trim();
+    if(!val) return;
+    appendChat("管理员：" + val, true);
+    chatbotResponse(val);
+    chatInput.value = '';
+  });
+  chatInput.addEventListener('keydown', e => {
+    if(e.key === 'Enter') {
+      chatSendBtn.click();
+    }
+  });
+</script>
+</body>
+</html>
+
